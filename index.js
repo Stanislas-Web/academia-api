@@ -9,7 +9,7 @@ mongoose.connect("mongodb+srv://stanislasmakengo1:0826016607makengo@cluster0.xbb
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 80;
 
 app.listen(port, () => {
   console.log('Express server démarré sur le port ' + port);
