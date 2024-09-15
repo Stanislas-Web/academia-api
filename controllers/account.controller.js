@@ -1,28 +1,61 @@
 
 const { status } = require("express/lib/response");
-const { Transacademia } = require("../models/transacademia.model");
+const { Account } = require("../models/account.model");
 const axios = require('axios');
 const FormData = require('form-data');
 
-module.exports.createTransacademia = async (req, res) => {
+function splitNomComplet(nomComplet) {
+  const parts = nomComplet.trim().split(/\s+/);
+  let nom, postnom, prenom;
+
+  if (parts.length >= 3) {
+    [nom, postnom, prenom] = parts;
+  } else if (parts.length === 2) {
+    [nom, postnom] = parts;
+    prenom = 'vide'; // ou null, selon votre préférence
+  } else if (parts.length === 1) {
+    [nom] = parts;
+    postnom = 'vide';
+    prenom = 'vide';
+  } else {
+    nom = postnom = prenom = 'vide';
+  }
+
+  return { nom, postnom, prenom };
+}
+
+module.exports.createAccount = async (req, res) => {
   const {
     phoneWhatsapp,
+    phone,
+    nomComplet,
+    universite,
   } = req.body;
 
-  const transacademia = new Transacademia({
+  const { nom, postnom, prenom } = splitNomComplet(nomComplet);
+
+  const account = new Account({
     phoneWhatsapp: phoneWhatsapp,
-    phonePayment: "default",
-    phoneAccount: "default",
-    status: "pending",
-    stdTac: "default",
+    phoneAccount: phone,
+    nom: nom,
+    postnom: postnom,
+    prenom: prenom,
+    universite: universite
   });
 
-  const result = await transacademia.save();
+  try {
+    const result = await account.save();
 
-  return res.status(201).send({
-    message: "Save Trans Academia datas successfully",
-    data: result,
-  });
+    return res.status(201).send({
+      message: "Save account data successfully",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      message: "Error saving account data",
+      error: error.message
+    });
+  }
 };
 
 
@@ -121,7 +154,6 @@ module.exports.updatefetcSTDTAC = async (req, res) => {
     message: "update  Academia datas successfully",
     data: transacademia,
   });
-
 };
 
 
